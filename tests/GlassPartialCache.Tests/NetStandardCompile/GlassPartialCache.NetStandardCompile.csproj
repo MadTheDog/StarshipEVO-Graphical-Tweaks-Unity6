@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <NuGetAudit>false</NuGetAudit>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../GlassPartialGeometryCache.prototype.cs" Link="GlassPartialGeometryCache.prototype.cs" />
+    <Compile Include="../../GlassPartialCoverage.Tests/GlassCapClipContracts.cs" Link="GlassCapClipContracts.cs" />
+    <Compile Include="../../GlassPartialGeometry.Tests/GlassPartialGeometry.prototype.cs" Link="GlassPartialGeometry.prototype.cs" />
+  </ItemGroup>
+</Project>

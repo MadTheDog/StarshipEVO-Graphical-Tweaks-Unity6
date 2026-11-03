@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework><LangVersion>latest</LangVersion><NuGetAudit>false</NuGetAudit>
+    <ManagedDir Condition="'$(ManagedDir)'==''">D:\SteamLibrary\steamapps\common\Starship EVO\Starship EVO_Data\Managed</ManagedDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../GlassShapeCatalog.Tests/GlassShapeGrouping.prototype.cs" Link="GlassShapeGrouping.prototype.cs" />
+    <Compile Include="../GlassShapeContact.Tests/GlassShapeContactModel.prototype.cs" Link="GlassShapeContactModel.prototype.cs" />
+    <Compile Include="../GlassShapeDeformation.Tests/GlassShapeDeformationModel.prototype.cs" Link="GlassShapeDeformationModel.prototype.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassPolygonCoveragePrimitives.cs" Link="GlassPolygonCoveragePrimitives.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassShapeVariantLayout.cs" Link="GlassShapeVariantLayout.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassNominalCapModel.cs" Link="GlassNominalCapModel.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassNominalCapProfiles.cs" Link="GlassNominalCapProfiles.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp"><HintPath>$(ManagedDir)\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(ManagedDir)\UnityEngine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedDir)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Mathematics"><HintPath>$(ManagedDir)\Unity.Mathematics.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Collections"><HintPath>$(ManagedDir)\Unity.Collections.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

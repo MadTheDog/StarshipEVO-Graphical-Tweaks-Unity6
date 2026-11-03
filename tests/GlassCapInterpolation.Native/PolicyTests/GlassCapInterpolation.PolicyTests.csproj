@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><ImplicitUsings>enable</ImplicitUsings><DefineConstants>GLASS_CAP_CPU_ONLY</DefineConstants><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../GlassCapInterpolationBuffers.prototype.cs" Link="GlassCapInterpolationBuffers.prototype.cs" />
+    <Compile Include="../../GlassPartialCoverage.Tests/GlassCapClipContracts.cs" Link="GlassCapClipContracts.cs" />
+    <Compile Include="../../GlassPartialGeometry.Tests/GlassPartialGeometry.prototype.cs" Link="GlassPartialGeometry.prototype.cs" />
+  </ItemGroup>
+</Project>

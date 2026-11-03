@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><EnableDefaultCompileItems>false</EnableDefaultCompileItems></PropertyGroup>
+  <ItemGroup><Compile Include="Program.cs"/><Compile Include="../../src/GraphicalTweaks/ShadowDistanceModel.cs" Link="ShadowDistanceModel.cs"/><Compile Include="../../src/GraphicalTweaks/ShadowResolutionModel.cs" Link="ShadowResolutionModel.cs"/><Compile Include="../../src/GraphicalTweaks/DecalRangeModel.cs" Link="DecalRangeModel.cs"/><Compile Include="../../src/GraphicalTweaks/ProjectionFootprintModel.cs" Link="ProjectionFootprintModel.cs"/></ItemGroup>
+</Project>

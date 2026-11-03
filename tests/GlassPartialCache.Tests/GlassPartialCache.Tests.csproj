@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><ImplicitUsings>enable</ImplicitUsings><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="NetStandardCompile/**/*.cs" />
+    <Compile Include="../GlassPartialCoverage.Tests/GlassCapClipContracts.cs" Link="GlassCapClipContracts.cs" />
+    <Compile Include="../GlassPartialGeometry.Tests/GlassPartialGeometry.prototype.cs" Link="GlassPartialGeometry.prototype.cs" />
+  </ItemGroup>
+</Project>

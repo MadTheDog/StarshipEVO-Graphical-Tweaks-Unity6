@@ -1,0 +1,98 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>GraphicalTweaks</AssemblyName>
+    <Version>2.0.0</Version>
+    <Authors>Sal</Authors>
+    <Product>Sal's Graphical Tweaks</Product>
+    <PackageLicenseExpression>MIT-0</PackageLicenseExpression>
+    <GameDir Condition="'$(GameDir)'==''">$(MSBuildThisFileDirectory)..\..\game</GameDir>
+    <ManagedDir>$(GameDir)\Starship EVO_Data\Managed</ManagedDir>
+    <LoaderDir Condition="'$(LoaderDir)'==''">$(GameDir)\BepInEx\core</LoaderDir>
+    <DefineConstants>$(DefineConstants);SEVO_UNITY6</DefineConstants>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../tests/GlassShapeDeformation.Tests/GlassShapeDeformationModel.prototype.cs" Link="GlassShapeDeformationModel.cs" />
+    <Compile Include="../../tests/GlassShapeContact.Tests/GlassShapeContactModel.prototype.cs" Link="GlassShapeContactModel.cs" />
+    <Compile Include="../../tests/GlassShapeCatalog.Tests/GlassShapeGrouping.prototype.cs" Link="GlassShapeGrouping.cs" />
+    <Compile Include="../../tests/GlassShapeCatalog.Native/GlassShapeRuntimeCatalog.prototype.cs" Link="GlassShapeRuntimeCatalog.cs" />
+    <Compile Include="../../tests/GlassShapeCoverage.Native/GlassShapeCoverage.prototype.cs" Link="GlassShapeCoverage.cs" />
+    <Compile Include="../../tests/GlassShapeCoverage.Native/GlassLifecycleState.cs" Link="GlassLifecycleState.cs" />
+    <Compile Include="../../tests/GlassShapePublication.Tests/GlassMaskSnapshot.cs" Link="GlassMaskSnapshot.cs" />
+    <Compile Include="../../tests/GlassRenderingProbe/GlassSeamValidation.cs" Link="GlassSeamValidation.cs" />
+    <Compile Include="../../tests/GlassRenderingProbe/GlassComparisonOutcome.cs" Link="GlassComparisonOutcome.cs" />
+    <Compile Include="../../tests/GlassPartialCoverage.Tests/GlassCapClipContracts.cs" Link="GlassCapClipContracts.cs" />
+    <Compile Include="../../tests/GlassPartialGeometry.Tests/GlassPartialGeometry.prototype.cs" Link="GlassPartialGeometry.cs" />
+    <Compile Include="../../tests/GlassCapInterpolation.Native/GlassCapInterpolationBuffers.prototype.cs" Link="GlassCapInterpolationBuffers.cs" />
+    <Compile Include="../../tests/GlassCapInterpolation.Native/GlassCapInterpolationCandidates.prototype.cs" Link="GlassCapInterpolationCandidates.cs" />
+    <Compile Include="../../tests/GlassPartialCache.Tests/GlassPartialGeometryCache.prototype.cs" Link="GlassPartialGeometryCache.cs" />
+    <Compile Include="../../tests/GlassPartialTail.Native/GlassPartialTail.prototype.cs" Link="GlassPartialTail.cs" />
+    <Compile Include="../../tests/GlassPartialCoverage.Native/GlassPartialCoverage.prototype.cs" Link="GlassPartialCoverage.cs" />
+    <Compile Include="../../tests/GlassMixedCaps.Tests/GlassMixedCapCatalog.prototype.cs" Link="GlassMixedCapCatalog.cs" />
+    <Compile Include="../../tests/GlassMixedCaps.Native/GlassMixedCapCoverage.prototype.cs" Link="GlassMixedCapCoverage.cs" />
+    <Compile Include="../../tests/GlassPartialCoverage.Tests/GlassPartialCapQueries.prototype.cs" Link="GlassPartialCapQueries.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="BepInEx">
+      <HintPath>$(LoaderDir)\BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(LoaderDir)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>$(LoaderDir)\MonoMod.Utils.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>$(LoaderDir)\Mono.Cecil.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(ManagedDir)\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(ManagedDir)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ManagedDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>$(ManagedDir)\UnityEngine.AssetBundleModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>$(ManagedDir)\UnityEngine.ImageConversionModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(ManagedDir)\UnityEngine.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(ManagedDir)\UnityEngine.UIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.Mathematics">
+      <HintPath>$(ManagedDir)\Unity.Mathematics.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.Collections">
+      <HintPath>$(ManagedDir)\Unity.Collections.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../GraphicalTweaks/*.cs" Exclude="../GraphicalTweaks/Plugin.cs" />
+    <Reference Include="UnityEngine.MathematicsModule">
+      <HintPath>$(ManagedDir)\UnityEngine.MathematicsModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,254 @@
+// Standalone render-only prototype. Native buffers are read-only and every
+// expanded 124-byte vertex record is copied without interpreting its fields.
+#pragma kernel GTShapeCopyNativeV1
+#pragma kernel GTShapeBuildVariantsV1
+#pragma kernel GTShapeRemapCompactV1
+#pragma kernel GTShapeRemapCompactV2
+#pragma target 5.0
+
+struct GTShapeRawRecord
+{
+    uint4 a, b, c, d, e, f, g;
+    uint3 h;
+};
+
+StructuredBuffer<GTShapeRawRecord> _GTShapeNativeRecords : register(t0);
+StructuredBuffer<uint> _GTShapeTriangleFaceBits : register(t1);
+StructuredBuffer<uint4> _GTShapeClusterLookup : register(t2);
+StructuredBuffer<uint2> _GTShapeBuildMasks : register(t3);
+StructuredBuffer<uint2> _GTShapeNativeMapping : register(t4);
+StructuredBuffer<uint> _GTShapeNativeClipBits : register(t5);
+StructuredBuffer<uint4> _GTShapeCustomVariants : register(t6);
+RWStructuredBuffer<GTShapeRawRecord> _GTShapeOwnedRecords : register(u0);
+RWStructuredBuffer<uint2> _GTShapeOwnedMapping : register(u1);
+RWStructuredBuffer<uint> _GTShapeOwnedClipBits : register(u2);
+
+cbuffer GTShapeParams : register(b0)
+{
+    uint _GTShapeSourceVertexCount;
+    uint _GTShapeOwnedVertexCount;
+    uint _GTShapeWorkStart;
+    uint _GTShapeWorkCount;
+    uint _GTShapeSourceTriangleStart;
+    uint _GTShapePaddedTriangleStride;
+    uint _GTShapeVariantBaseTriangle;
+    uint _GTShapeValidMask;
+    uint _GTShapeMappingStart;
+    uint _GTShapeMappingOutputStart;
+    uint _GTShapeMappingCount;
+    uint _GTShapeBuildMaskCount;
+    uint _GTShapeLookupCount;
+    uint _GTShapeCustomDescriptorCount, _GTShapeCustomTailTriangleStart, _GTShapeReserved2;
+};
+
+bool GTShapeDimensions(out uint nativeTriangles, out uint ownedTriangles)
+{
+    uint sourceCount, sourceStride, ownedCount, ownedStride;
+    _GTShapeNativeRecords.GetDimensions(sourceCount, sourceStride);
+    _GTShapeOwnedRecords.GetDimensions(ownedCount, ownedStride);
+    nativeTriangles = sourceCount / 3;
+    ownedTriangles = ownedCount / 3;
+    return sourceStride == 124 && ownedStride == 124 &&
+        sourceCount == _GTShapeSourceVertexCount && ownedCount == _GTShapeOwnedVertexCount &&
+        sourceCount != 0 && sourceCount <= ownedCount && sourceCount % 3 == 0 && ownedCount % 3 == 0;
+}
+
+bool GTShapeDescriptorValid(uint sourceStart, uint triangleStride, uint variantBase, uint validMask,
+                            uint nativeTriangles, uint ownedTriangles)
+{
+    // Division/subtraction guards precede every potentially overflowing range
+    // product/addition. Densely numbered source groups bound variants to 256.
+    if (validMask == 0 || validMask > 255)
+        return false;
+    if ((validMask & (validMask + 1)) != 0 || sourceStart == 0 || sourceStart >= nativeTriangles ||
+        triangleStride == 0 || triangleStride % 12 != 0 || triangleStride > nativeTriangles - sourceStart ||
+        variantBase < nativeTriangles || variantBase > ownedTriangles)
+        return false;
+    if ((variantBase - nativeTriangles) % 12 != 0)
+        return false;
+    return triangleStride <= (ownedTriangles - variantBase) / (validMask + 1);
+}
+
+[numthreads(64, 1, 1)]
+void GTShapeCopyNativeV1(uint thread : SV_DispatchThreadID)
+{
+    uint sourceCount, sourceStride, ownedCount, ownedStride;
+    _GTShapeNativeRecords.GetDimensions(sourceCount, sourceStride);
+    _GTShapeOwnedRecords.GetDimensions(ownedCount, ownedStride);
+    if (thread >= _GTShapeWorkCount || sourceStride != 124 || ownedStride != 124 ||
+        sourceCount != _GTShapeSourceVertexCount || ownedCount != _GTShapeOwnedVertexCount ||
+        sourceCount > ownedCount || _GTShapeWorkStart > sourceCount ||
+        thread >= sourceCount - _GTShapeWorkStart)
+        return;
+    uint vertex = _GTShapeWorkStart + thread;
+    _GTShapeOwnedRecords[vertex] = _GTShapeNativeRecords[vertex];
+}
+
+[numthreads(64, 1, 1)]
+void GTShapeBuildVariantsV1(uint thread : SV_DispatchThreadID)
+{
+    if (thread >= _GTShapeWorkCount)
+        return;
+    uint nativeTriangles, ownedTriangles, bitCount, bitStride;
+    _GTShapeTriangleFaceBits.GetDimensions(bitCount, bitStride);
+    if (!GTShapeDimensions(nativeTriangles, ownedTriangles) || bitStride != 4 ||
+        !GTShapeDescriptorValid(_GTShapeSourceTriangleStart, _GTShapePaddedTriangleStride,
+            _GTShapeVariantBaseTriangle, _GTShapeValidMask, nativeTriangles, ownedTriangles) ||
+        _GTShapeSourceTriangleStart > bitCount ||
+        _GTShapePaddedTriangleStride > bitCount - _GTShapeSourceTriangleStart)
+        return;
+    // Descriptor validation proved these products fit the actual owned buffer.
+    uint verticesPerVariant = _GTShapePaddedTriangleStride * 3;
+    uint totalVertices = verticesPerVariant * (_GTShapeValidMask + 1);
+    if (_GTShapeWorkStart > totalVertices || thread >= totalVertices - _GTShapeWorkStart)
+        return;
+    uint work = _GTShapeWorkStart + thread;
+    uint mask = work / verticesPerVariant;
+    uint localVertex = work % verticesPerVariant;
+    uint sourceTriangle = localVertex / 3;
+    uint bit = _GTShapeTriangleFaceBits[_GTShapeSourceTriangleStart + sourceTriangle];
+    bool oneValidBit = bit != 0 && (bit & (bit - 1)) == 0 && (bit & ~_GTShapeValidMask) == 0;
+    if (oneValidBit && (mask & bit) != 0)
+        localVertex = sourceTriangle * 3;
+    uint sourceVertex = _GTShapeSourceTriangleStart * 3 + localVertex;
+    uint destinationVertex = _GTShapeVariantBaseTriangle * 3 + work;
+    _GTShapeOwnedRecords[destinationVertex] = _GTShapeNativeRecords[sourceVertex];
+}
+
+uint2 GTShapeRemapOne(uint2 mapping)
+{
+    if (mapping.x == 0)
+        return mapping;
+    uint nativeTriangles, ownedTriangles;
+    if (!GTShapeDimensions(nativeTriangles, ownedTriangles) || mapping.x >= nativeTriangles)
+        return mapping;
+    uint lookupCount, lookupStride, maskCount, maskStride;
+    _GTShapeClusterLookup.GetDimensions(lookupCount, lookupStride);
+    _GTShapeBuildMasks.GetDimensions(maskCount, maskStride);
+    if (lookupStride != 16 || maskStride != 8 || mapping.x >= lookupCount || mapping.x >= _GTShapeLookupCount ||
+        mapping.y >= maskCount || mapping.y >= _GTShapeBuildMaskCount)
+        return mapping;
+    uint4 descriptor = _GTShapeClusterLookup[mapping.x];
+    uint2 maskRecord = _GTShapeBuildMasks[mapping.y];
+    uint mask = maskRecord.x;
+    if (descriptor.z == 0 || mask == 0 || maskRecord.y != descriptor.w ||
+        (mask & ~descriptor.z) != 0 || mapping.x < descriptor.w)
+        return mapping;
+    uint clusterOffset = mapping.x - descriptor.w;
+    if (clusterOffset % 12 != 0 || clusterOffset >= descriptor.y || descriptor.x < clusterOffset)
+        return mapping;
+    uint firstVariantBase = descriptor.x - clusterOffset;
+    if (!GTShapeDescriptorValid(descriptor.w, descriptor.y, firstVariantBase, descriptor.z, nativeTriangles, ownedTriangles))
+        return mapping;
+    // The complete descriptor extent includes all 12 triangles of this cluster.
+    // Thus the validated products and this final sum cannot wrap or leave it.
+    mapping.x = firstVariantBase + mask * descriptor.y + clusterOffset;
+    return mapping;
+}
+
+[numthreads(64, 1, 1)]
+void GTShapeRemapCompactV1(uint thread : SV_DispatchThreadID)
+{
+    uint inputCount, inputStride, inputClipCount, inputClipStride;
+    uint outputCount, outputStride, outputClipCount, outputClipStride;
+    _GTShapeNativeMapping.GetDimensions(inputCount, inputStride);
+    _GTShapeNativeClipBits.GetDimensions(inputClipCount, inputClipStride);
+    _GTShapeOwnedMapping.GetDimensions(outputCount, outputStride);
+    _GTShapeOwnedClipBits.GetDimensions(outputClipCount, outputClipStride);
+    if (thread >= _GTShapeMappingCount || inputStride != 8 || inputClipStride != 4 ||
+        outputStride != 8 || outputClipStride != 4 ||
+        _GTShapeMappingStart > inputCount || _GTShapeMappingStart > inputClipCount ||
+        _GTShapeMappingOutputStart > outputCount || _GTShapeMappingOutputStart > outputClipCount ||
+        thread >= inputCount - _GTShapeMappingStart || thread >= inputClipCount - _GTShapeMappingStart ||
+        thread >= outputCount - _GTShapeMappingOutputStart || thread >= outputClipCount - _GTShapeMappingOutputStart)
+        return;
+    uint sourceIndex = _GTShapeMappingStart + thread;
+    uint outputIndex = _GTShapeMappingOutputStart + thread;
+    _GTShapeOwnedMapping[outputIndex] = GTShapeRemapOne(_GTShapeNativeMapping[sourceIndex]);
+    _GTShapeOwnedClipBits[outputIndex] = _GTShapeNativeClipBits[sourceIndex];
+}
+
+// UNCONNECTED diagnostic prototype. Host publication/resource lifetime must be
+// reviewed separately before this entry can replace the supported V1 path.
+// Mandatory host contract: verify actual buffer strides before binding. Under
+// FXC, StructuredBuffer.GetDimensions stride outputs are declared constants;
+// their checks below cannot independently detect a mismatched D3D11 resource.
+uint2 GTShapeRemapOneV2(uint2 mapping)
+{
+    if (mapping.x == 0)
+        return mapping;
+    uint nativeTriangles, ownedTriangles;
+    if (!GTShapeDimensions(nativeTriangles, ownedTriangles) || mapping.x >= nativeTriangles)
+        return mapping;
+    uint lookupCount, lookupStride, maskCount, maskStride;
+    _GTShapeClusterLookup.GetDimensions(lookupCount, lookupStride);
+    _GTShapeBuildMasks.GetDimensions(maskCount, maskStride);
+    if (lookupStride != 16 || maskStride != 8 || mapping.x >= lookupCount || mapping.x >= _GTShapeLookupCount ||
+        mapping.y >= maskCount || mapping.y >= _GTShapeBuildMaskCount)
+        return mapping;
+    uint4 descriptor = _GTShapeClusterLookup[mapping.x];
+    uint2 maskRecord = _GTShapeBuildMasks[mapping.y];
+    uint mask = maskRecord.x & 255;
+    if (descriptor.z == 0 || maskRecord.y != descriptor.w ||
+        (mask & ~descriptor.z) != 0 || mapping.x < descriptor.w)
+        return mapping;
+    uint clusterOffset = mapping.x - descriptor.w;
+    if (clusterOffset % 12 != 0 || clusterOffset >= descriptor.y || descriptor.x < clusterOffset)
+        return mapping;
+    uint firstVariantBase = descriptor.x - clusterOffset;
+    if (!GTShapeDescriptorValid(descriptor.w, descriptor.y, firstVariantBase, descriptor.z, nativeTriangles, ownedTriangles))
+        return mapping;
+    // This is the existing whole-face fallback, including native mask0. A bad
+    // custom slot cannot grant a new source identity or invalidate this proof.
+    uint2 fallback = mapping;
+    if (mask != 0)
+        fallback.x = firstVariantBase + mask * descriptor.y + clusterOffset;
+    uint customSlot = maskRecord.x >> 8;
+    if (customSlot == 0)
+        return fallback;
+    uint customCount, customStride;
+    _GTShapeCustomVariants.GetDimensions(customCount, customStride);
+    if (customStride != 16 || customCount == 0 || customCount > 256 ||
+        _GTShapeCustomDescriptorCount == 0 || _GTShapeCustomDescriptorCount > 256 ||
+        _GTShapeCustomDescriptorCount > customCount || customSlot > _GTShapeCustomDescriptorCount)
+        return fallback;
+    uint4 custom = _GTShapeCustomVariants[customSlot - 1];
+    // Static descriptor validation already proved the following extent product
+    // and sum fit ownedTriangles. Tail alignment is RELATIVE to its start: the
+    // native prefix need not have an absolute twelve-triangle alignment.
+    uint staticExtent = firstVariantBase + descriptor.y * (descriptor.z + 1);
+    if (custom.x != descriptor.w || custom.x != maskRecord.y ||
+        custom.z != descriptor.y || custom.z == 0 || custom.z % 12 != 0 ||
+        custom.w != mask || (custom.w & ~descriptor.z) != 0 ||
+        _GTShapeCustomTailTriangleStart < nativeTriangles ||
+        _GTShapeCustomTailTriangleStart < staticExtent || _GTShapeCustomTailTriangleStart > ownedTriangles ||
+        custom.y == 0 || custom.y < _GTShapeCustomTailTriangleStart || custom.y > ownedTriangles)
+        return fallback;
+    if ((custom.y - _GTShapeCustomTailTriangleStart) % 12 != 0 ||
+        custom.z > ownedTriangles - custom.y || clusterOffset >= custom.z)
+        return fallback;
+    mapping.x = custom.y + clusterOffset;
+    return mapping;
+}
+
+[numthreads(64, 1, 1)]
+void GTShapeRemapCompactV2(uint thread : SV_DispatchThreadID)
+{
+    uint inputCount, inputStride, inputClipCount, inputClipStride;
+    uint outputCount, outputStride, outputClipCount, outputClipStride;
+    _GTShapeNativeMapping.GetDimensions(inputCount, inputStride);
+    _GTShapeNativeClipBits.GetDimensions(inputClipCount, inputClipStride);
+    _GTShapeOwnedMapping.GetDimensions(outputCount, outputStride);
+    _GTShapeOwnedClipBits.GetDimensions(outputClipCount, outputClipStride);
+    if (thread >= _GTShapeMappingCount || inputStride != 8 || inputClipStride != 4 ||
+        outputStride != 8 || outputClipStride != 4 ||
+        _GTShapeMappingStart > inputCount || _GTShapeMappingStart > inputClipCount ||
+        _GTShapeMappingOutputStart > outputCount || _GTShapeMappingOutputStart > outputClipCount ||
+        thread >= inputCount - _GTShapeMappingStart || thread >= inputClipCount - _GTShapeMappingStart ||
+        thread >= outputCount - _GTShapeMappingOutputStart || thread >= outputClipCount - _GTShapeMappingOutputStart)
+        return;
+    uint sourceIndex = _GTShapeMappingStart + thread;
+    uint outputIndex = _GTShapeMappingOutputStart + thread;
+    _GTShapeOwnedMapping[outputIndex] = GTShapeRemapOneV2(_GTShapeNativeMapping[sourceIndex]);
+    _GTShapeOwnedClipBits[outputIndex] = _GTShapeNativeClipBits[sourceIndex];
+}

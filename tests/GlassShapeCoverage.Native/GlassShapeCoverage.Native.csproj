@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework><LangVersion>latest</LangVersion><NuGetAudit>false</NuGetAudit><DefineConstants>$(DefineConstants);GLASS_PARTIAL_NATIVE_FIXTURE</DefineConstants>
+    <ManagedDir>D:\SteamLibrary\steamapps\common\Starship EVO\Starship EVO_Data\Managed</ManagedDir>
+    <LoaderDir>$(MSBuildThisFileDirectory)..\..\.tools\BepInEx-5.4.23.5\BepInEx\core</LoaderDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../GlassShapePublication.Tests/GlassMaskSnapshot.cs" Link="GlassMaskSnapshot.cs" />
+    <Compile Include="../GlassShapeCatalog.Native/GlassShapeRuntimeCatalog.prototype.cs" Link="GlassShapeRuntimeCatalog.cs" />
+    <Compile Include="../GlassShapeCatalog.Tests/GlassShapeGrouping.prototype.cs" Link="GlassShapeGrouping.cs" />
+    <Compile Include="../GlassShapeContact.Tests/GlassShapeContactModel.prototype.cs" Link="GlassShapeContactModel.cs" />
+    <Compile Include="../GlassShapeDeformation.Tests/GlassShapeDeformationModel.prototype.cs" Link="GlassShapeDeformationModel.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassPolygonCoveragePrimitives.cs" Link="GlassPolygonCoveragePrimitives.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassPolygonCoverageModel.cs" Link="GlassPolygonCoverageModel.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassShapeVariantLayout.cs" Link="GlassShapeVariantLayout.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassMaskUploadJournal.cs" Link="GlassMaskUploadJournal.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassFaceCoveragePending.cs" Link="GlassFaceCoveragePending.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassNominalCapModel.cs" Link="GlassNominalCapModel.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassNominalCapProfiles.cs" Link="GlassNominalCapProfiles.cs" />
+    <Compile Include="../GlassMixedCaps.Tests/GlassMixedCapCatalog.prototype.cs" Link="GlassMixedCapCatalog.cs" />
+    <Compile Include="../GlassMixedCaps.Native/GlassMixedCapCoverage.prototype.cs" Link="GlassMixedCapCoverage.cs" />
+    <Compile Include="../GlassPartialCoverage.Tests/GlassCapClipContracts.cs" Link="GlassCapClipContracts.cs" />
+    <Compile Include="../GlassPartialCoverage.Tests/GlassPartialCapQueries.prototype.cs" Link="GlassPartialCapQueries.cs" />
+    <Compile Include="../GlassPartialCoverage.Native/GlassPartialCoverage.prototype.cs" Link="GlassPartialCoverage.cs" />
+    <Compile Include="../GlassPartialCoverage.Native/GlassPartialNativeBindings.fixture.cs" Link="GlassPartialNativeBindings.fixture.cs" />
+    <Compile Include="../GlassPartialCache.Tests/GlassPartialGeometryCache.prototype.cs" Link="GlassPartialGeometryCache.cs" />
+    <Compile Include="../GlassPartialTail.Native/GlassPartialTail.prototype.cs" Link="GlassPartialTail.cs" />
+    <Compile Include="../GlassPartialGeometry.Tests/GlassPartialGeometry.prototype.cs" Link="GlassPartialGeometry.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassShapeGeometryRemap.cs" Link="GlassShapeGeometryRemap.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony"><HintPath>$(LoaderDir)\0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp"><HintPath>$(ManagedDir)\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(ManagedDir)\UnityEngine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedDir)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Mathematics"><HintPath>$(ManagedDir)\Unity.Mathematics.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Unity.Collections"><HintPath>$(ManagedDir)\Unity.Collections.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

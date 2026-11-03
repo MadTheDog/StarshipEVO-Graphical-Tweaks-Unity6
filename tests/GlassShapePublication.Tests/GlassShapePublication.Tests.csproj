@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../GlassShapeCoverage.Native/GlassLifecycleState.cs" Link="GlassLifecycleState.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassMaskUploadJournal.cs" Link="GlassMaskUploadJournal.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassPolygonCoverageModel.cs" Link="GlassPolygonCoverageModel.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassPolygonCoveragePrimitives.cs" Link="GlassPolygonCoveragePrimitives.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassFaceCoveragePending.cs" Link="GlassFaceCoveragePending.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassNominalCapModel.cs" Link="GlassNominalCapModel.cs" />
+  </ItemGroup>
+</Project>

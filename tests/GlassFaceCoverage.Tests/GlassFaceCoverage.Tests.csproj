@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup><Compile Include="../../src/GraphicalTweaks/GlassFaceCoverageModel.cs" Link="GlassFaceCoverageModel.cs"/><Compile Include="../../src/GraphicalTweaks/GlassFaceCoveragePending.cs" Link="GlassFaceCoveragePending.cs"/></ItemGroup>
+</Project>

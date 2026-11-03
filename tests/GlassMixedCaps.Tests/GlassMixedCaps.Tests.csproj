@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><LangVersion>latest</LangVersion><ImplicitUsings>enable</ImplicitUsings><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/GraphicalTweaks/GlassPolygonCoveragePrimitives.cs" Link="GlassPolygonCoveragePrimitives.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassPolygonCoverageModel.cs" Link="GlassPolygonCoverageModel.cs" />
+    <Compile Include="../GlassShapeDeformation.Tests/GlassShapeDeformationModel.prototype.cs" Link="GlassShapeDeformationModel.cs" />
+    <Compile Include="../GlassShapeContact.Tests/GlassShapeContactModel.prototype.cs" Link="GlassShapeContactModel.cs" />
+    <Compile Include="../GlassShapeCatalog.Tests/GlassShapeGrouping.prototype.cs" Link="GlassShapeGrouping.cs" />
+    <Compile Include="../GlassPartialCoverage.Tests/GlassCapClipContracts.cs" Link="GlassCapClipContracts.cs" />
+    <Compile Include="../GlassPartialCoverage.Tests/GlassPartialCapQueries.prototype.cs" Link="GlassPartialCapQueries.cs" />
+  </ItemGroup>
+</Project>

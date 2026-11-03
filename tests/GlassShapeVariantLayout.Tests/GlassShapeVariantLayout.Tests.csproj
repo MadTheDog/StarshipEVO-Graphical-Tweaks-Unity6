@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup><Compile Include="../../src/GraphicalTweaks/GlassShapeVariantLayout.cs" Link="GlassShapeVariantLayout.cs" /></ItemGroup>
+</Project>

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><LangVersion>latest</LangVersion><ImplicitUsings>enable</ImplicitUsings><DefineConstants>GLASS_PARTIAL_PUBLICATION_POLICY_ONLY</DefineConstants><NuGetAudit>false</NuGetAudit></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../GlassPartialCoverage.prototype.cs" />
+    <Compile Include="../../GlassPartialCache.Tests/GlassPartialGeometryCache.prototype.cs" />
+    <Compile Include="../../GlassPartialGeometry.Tests/GlassPartialGeometry.prototype.cs" />
+    <Compile Include="../../GlassPartialCoverage.Tests/GlassCapClipContracts.cs" />
+  </ItemGroup>
+</Project>

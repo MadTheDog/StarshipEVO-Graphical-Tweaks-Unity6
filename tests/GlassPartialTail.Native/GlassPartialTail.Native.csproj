@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>netstandard2.0</TargetFramework><LangVersion>latest</LangVersion><NuGetAudit>false</NuGetAudit><EnableDefaultCompileItems>false</EnableDefaultCompileItems><ManagedDir Condition="'$(ManagedDir)'==''">D:\SteamLibrary\steamapps\common\Starship EVO\Starship EVO_Data\Managed</ManagedDir></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="GlassPartialTail.prototype.cs" />
+    <Compile Include="../GlassPartialCache.Tests/GlassPartialGeometryCache.prototype.cs" Link="GlassPartialGeometryCache.prototype.cs" />
+    <Compile Include="../GlassPartialCoverage.Tests/GlassCapClipContracts.cs" Link="GlassCapClipContracts.cs" />
+    <Compile Include="../GlassPartialGeometry.Tests/GlassPartialGeometry.prototype.cs" Link="GlassPartialGeometry.prototype.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassShapeVariantLayout.cs" Link="GlassShapeVariantLayout.cs" />
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedDir)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

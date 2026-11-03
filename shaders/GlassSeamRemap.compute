@@ -1,0 +1,122 @@
+// Original rendering-buffer adapter. Source meshes and physical geometry are
+// never modified. Covered triangles are copied as zero-area render triangles.
+#pragma kernel CopyAndBuildVariants
+#pragma kernel RemapDrawCompact
+#pragma target 5.0
+
+struct GTShapeVertex
+{
+    float3 position;
+    float3 normal;
+    float4 tangent;
+    float3 binormal;
+    float2 uv;
+    uint materialIndex;
+    float3 boundsCenter;
+    float3 boundsSize;
+    float3 passMinimum;
+    float3 passMaximum;
+    float3 vertexOffset;
+};
+
+struct GTBuildRecord
+{
+    uint pixelData;
+    uint vertexData;
+    uint rotationAndMaterial;
+    uint resizeCounts;
+    float3 position;
+    uint paint;
+    float unitSize;
+    float health;
+    int transformIndex;
+};
+
+StructuredBuffer<GTShapeVertex> _GTOriginalShapeMeshData;
+RWStructuredBuffer<GTShapeVertex> _GTRemappedShapeMeshData;
+StructuredBuffer<uint2> _GTOriginalTriBrickIDMapping;
+RWStructuredBuffer<uint2> _GTRemappedTriBrickIDMapping;
+StructuredBuffer<GTBuildRecord> BrickBuildData;
+StructuredBuffer<uint> _GTGlassFaceMasks;
+StructuredBuffer<uint> _GTLocalFaceMaskLookup;
+StructuredBuffer<uint> _GTOriginalDrawMappingClipZ;
+RWStructuredBuffer<uint> _GTRemappedDrawMappingClipZ;
+
+uint _GTOriginalShapeVertexCount;
+uint _GTCubeStartTriangle;
+uint _GTMappingStart;
+uint _GTMappingCount;
+uint _GTBuildDataCount;
+uint _GTGlassFaceMaskCount;
+uint _GTMappingOutputStart;
+
+uint GTLocalAxisFace(float3 normal)
+{
+    if (abs(normal.x) > 0.999)
+        return normal.x > 0 ? 0 : 1;
+    if (abs(normal.y) > 0.999)
+        return normal.y > 0 ? 2 : 3;
+    if (abs(normal.z) > 0.999)
+        return normal.z > 0 ? 4 : 5;
+    return 6;
+}
+
+[numthreads(64, 1, 1)]
+void CopyAndBuildVariants(uint vertex : SV_DispatchThreadID)
+{
+    if (vertex < _GTOriginalShapeVertexCount)
+    {
+        _GTRemappedShapeMeshData[vertex] = _GTOriginalShapeMeshData[vertex];
+        return;
+    }
+    uint appended = vertex - _GTOriginalShapeVertexCount;
+    if (appended >= 64 * 36)
+        return;
+    uint localMask = appended / 36;
+    uint localVertex = appended % 36;
+    uint source = 3 * _GTCubeStartTriangle + localVertex;
+    GTShapeVertex record = _GTOriginalShapeMeshData[source];
+    uint face = GTLocalAxisFace(record.normal);
+    if (face < 6 && (localMask & (1u << face)) != 0)
+    {
+        // All three records of a hidden triangle become the same complete
+        // record, so later native resize/UV/dynamic work cannot reopen it.
+        source = 3 * _GTCubeStartTriangle + (localVertex / 3) * 3;
+        record = _GTOriginalShapeMeshData[source];
+    }
+    _GTRemappedShapeMeshData[vertex] = record;
+}
+
+[numthreads(64, 1, 1)]
+void RemapDrawCompact(uint thread : SV_DispatchThreadID)
+{
+    if (thread >= _GTMappingCount)
+        return;
+    uint sourceIndex = _GTMappingStart + thread;
+    uint destinationIndex = _GTMappingOutputStart + thread;
+    uint sourceCount, destinationCount, sourceClipCount, destinationClipCount, stride;
+    _GTOriginalTriBrickIDMapping.GetDimensions(sourceCount, stride);
+    _GTRemappedTriBrickIDMapping.GetDimensions(destinationCount, stride);
+    _GTOriginalDrawMappingClipZ.GetDimensions(sourceClipCount, stride);
+    _GTRemappedDrawMappingClipZ.GetDimensions(destinationClipCount, stride);
+    if (sourceIndex < _GTMappingStart || destinationIndex < _GTMappingOutputStart ||
+        sourceIndex >= sourceCount || sourceIndex >= sourceClipCount ||
+        destinationIndex >= destinationCount || destinationIndex >= destinationClipCount)
+        return;
+    uint2 mapping = _GTOriginalTriBrickIDMapping[sourceIndex];
+    if (mapping.x == _GTCubeStartTriangle && mapping.y < _GTGlassFaceMaskCount &&
+        mapping.y < _GTBuildDataCount)
+    {
+        uint entityMask = _GTGlassFaceMasks[mapping.y] & 63;
+        uint rotation = BrickBuildData[mapping.y].rotationAndMaterial & 31;
+        if (entityMask != 0 && rotation < 24)
+        {
+            uint localMask = _GTLocalFaceMaskLookup[rotation * 64 + entityMask];
+            if (localMask != 0)
+                mapping.x = _GTOriginalShapeVertexCount / 3 + localMask * 12;
+        }
+    }
+    _GTRemappedTriBrickIDMapping[destinationIndex] = mapping;
+    // uint views preserve the native float clip-distance bits exactly, including NaNs.
+    _GTRemappedDrawMappingClipZ[destinationIndex] = _GTOriginalDrawMappingClipZ[sourceIndex];
+}

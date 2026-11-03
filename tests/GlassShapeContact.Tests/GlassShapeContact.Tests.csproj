@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><NuGetAudit>false</NuGetAudit><LangVersion>latest</LangVersion></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../GlassShapeDeformation.Tests/GlassShapeDeformationModel.prototype.cs" Link="GlassShapeDeformationModel.prototype.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassPolygonCoveragePrimitives.cs" Link="GlassPolygonCoveragePrimitives.cs" />
+    <Compile Include="../../src/GraphicalTweaks/GlassPolygonCoverageModel.cs" Link="GlassPolygonCoverageModel.cs" />
+  </ItemGroup>
+</Project>

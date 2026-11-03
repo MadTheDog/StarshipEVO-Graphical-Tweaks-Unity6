@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><OutputType>Exe</OutputType><ImplicitUsings>enable</ImplicitUsings><NuGetAudit>false</NuGetAudit><DefineConstants>$(DefineConstants);GLASS_PARTIAL_TAIL_CPU_ONLY</DefineConstants></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../GlassPartialTail.prototype.cs" Link="GlassPartialTail.prototype.cs" />
+    <Compile Include="../../GlassPartialCache.Tests/GlassPartialGeometryCache.prototype.cs" Link="GlassPartialGeometryCache.prototype.cs" />
+    <Compile Include="../../GlassPartialCoverage.Tests/GlassCapClipContracts.cs" Link="GlassCapClipContracts.cs" />
+    <Compile Include="../../GlassPartialGeometry.Tests/GlassPartialGeometry.prototype.cs" Link="GlassPartialGeometry.prototype.cs" />
+    <Compile Include="../../../src/GraphicalTweaks/GlassShapeVariantLayout.cs" Link="GlassShapeVariantLayout.cs" />
+  </ItemGroup>
+</Project>
