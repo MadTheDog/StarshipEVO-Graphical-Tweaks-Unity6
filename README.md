@@ -31,7 +31,8 @@ Find the controls under **Options → Graphics**. Changes are saved between sess
 - Startup, clean exit, graphics menu rebuilds, numeric inputs and resets in an isolated installation.
 - Shadow distance and sharp range in the cockpit, plus native sun-resolution setter and reset checks.
 - Live decal updates at 10×, empty-pass dispatch counts and native ambient occlusion attachment checks.
-- Blocked sunlight glare, the rounded glass corner, the moving blue band and the neutral sheen presets in the cockpit. Pipe end caps passed catalog and geometry checks.
+- Blocked sunlight glare, the rounded glass corner, the moving blue band and the neutral sheen presets in the cockpit.
+- Matching transparent pipe joins passed geometry checks and appeared seamless in a player visual check.
 
 On one detailed ship at 1440p, the Unity 6 benchmark averaged **72.4 FPS** at
 Vanilla MAX, **74.3 FPS** with the tweaks enabled at vanilla ranges, and
@@ -84,7 +85,6 @@ When updating, close the game and replace both files together. Keep one installe
 
 - Back up an existing world before trying the mod. The tweaks apply to local rendering and client preferences.
 - Multiplayer, sustained remote building and stress tests with many grids or windows are pending.
-- Matching pipe end caps are covered. The pipe’s textured side bands still need visual validation.
 - Shadow coverage and quality affect the sunlight correction. Decal range depends on projected size, receiver depth and tile limits.
 - Unofficial mod, unaffiliated with Moonfire Entertainment.
 - [Building from source](docs/DEVELOPMENT.md).
