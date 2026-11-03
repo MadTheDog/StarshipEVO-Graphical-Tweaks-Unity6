@@ -33,7 +33,10 @@ Find the controls under **Options → Graphics**. Changes are saved between sess
 - Live decal updates at 10×, empty-pass dispatch counts and native ambient occlusion attachment checks.
 - Blocked sunlight glare, the rounded glass corner, the moving blue band and the neutral sheen presets in the cockpit. Pipe end caps passed catalog and geometry checks.
 
-The Unity 6 tests verified rendering behavior and skipped work. A controlled Unity 6 FPS benchmark is still pending. [Performance details](docs/PERFORMANCE.md).
+On one detailed ship at 1440p, the Unity 6 benchmark averaged **72.4 FPS** at
+Vanilla MAX, **74.3 FPS** with the tweaks enabled at vanilla ranges, and
+**69.9 FPS** with 1500-unit shadows and 10× decals. The runs changed groups of
+settings together. [Settings, 1% lows and test method](docs/PERFORMANCE.md).
 
 ---
 
