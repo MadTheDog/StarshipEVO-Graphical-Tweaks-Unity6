@@ -53,13 +53,13 @@ static class Program
         failures.Clear();
         int nativeStarted = 0, nativeRestored = 0;
         var admission = new FeatureLifetime((name, error) => failures.Add(name));
-        Check(!admission.TryStartNative("unknown", Guid.Empty, () => nativeStarted++, () => nativeRestored++), "unknown build cannot initialize native feature");
+        Action changedContract = () => throw new NotSupportedException("changed draw contract");
+        Check(!admission.TryStartNative("unknown", changedContract, () => nativeStarted++, () => nativeRestored++), "changed contract cannot initialize native feature");
         Check(nativeStarted == 0 && nativeRestored == 0 && failures.Count == 1, "rejected build performs no native writes or restoration");
-        Check(!admission.TryStartNative("unknown", Guid.Empty, () => nativeStarted++, () => nativeRestored++) && failures.Count == 1, "unsupported feature reports once");
+        Check(!admission.TryStartNative("unknown", changedContract, () => nativeStarted++, () => nativeRestored++) && failures.Count == 1, "unsupported feature reports once");
         Check(admission.TryStart("public shadow API", () => events.Add("shadow API"), () => events.Add("shadow reset")), "public settings survive unsupported native features");
-        Check(admission.TryStartNative("known", NativeBuildProfile.ValidatedAssembly, () => nativeStarted++, () => nativeRestored++), "inspected native build is admitted");
-        Check(!admission.TryStartNative("other version", new Guid("f4666bd3-9a44-486c-b149-36d0a9c82e72"), () => nativeStarted++, () => nativeRestored++), "Unity2019 build is rejected by Unity6 native integration");
-        Check(!admission.TryStartNative("different Unity6", new Guid("8bc6e2c3-dad6-4cd4-89ec-0f0d60f91a6d"), () => nativeStarted++, () => nativeRestored++), "uninspected Unity6 build is rejected");
+        Check(admission.TryStartNative("known", () => { }, () => nativeStarted++, () => nativeRestored++), "matching contract is admitted independently of other failures");
+        Check(!admission.TryStartNative("missing target", () => throw new MissingMethodException("Draw"), () => nativeStarted++, () => nativeRestored++), "missing native hook is rejected");
         admission.Dispose();
         Check(nativeStarted == 1 && nativeRestored == 1, "only admitted native feature acquires and restores resources");
         Console.WriteLine("PASS Unity6 runtime lifetime: " + checks + " checks");

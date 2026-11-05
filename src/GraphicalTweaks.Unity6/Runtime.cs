@@ -24,7 +24,6 @@ namespace GraphicalTweaks
         private bool isActiveAndEnabled => host.isActiveAndEnabled;
         private readonly FeatureLifetime lifetime;
         private bool disposed;
-        private static Guid NativeAssembly => typeof(VoxelEngine.Brick).Assembly.ManifestModule.ModuleVersionId;
         internal Runtime(Plugin host)
         {
             this.host = host;
@@ -119,7 +118,7 @@ namespace GraphicalTweaks
             // Native ResourcesLoader.Awake uploads the shape/material/rotation
             // tables before plugin Start. Observe those successful uploads here;
             // asset loading and render interception still start in Start.
-            lifetime.TryStartNative("glass-bootstrap", NativeAssembly, () =>
+            lifetime.TryStartNative("glass-bootstrap", () => NativeFeatureContracts.Require("glass-bootstrap"), () =>
             {
                 NativeLayout.Verify(message => Logger.LogInfo(message));
                 glassController = new GlassRenderingController(Logger, bundlePath);
@@ -139,7 +138,7 @@ namespace GraphicalTweaks
                 before: owner => DecalProjection.Install(owner), restore: DecalProjection.Shutdown, native: true);
             InstallPatchGroup("renderer", () => NestedPatches(typeof(RendererOptimization)),
                 restore: () => RendererOptimization.Enabled = false, native: true);
-            lifetime.TryStartNative("ambient-occlusion", NativeAssembly, () =>
+            lifetime.TryStartNative("ambient-occlusion", () => NativeFeatureContracts.Require("ambient-occlusion"), () =>
             {
                 AmbientOcclusionLifecycle.Install(new Harmony(Id + ".ao"), message => Logger.LogInfo(message));
                 ApplyAmbientOcclusionOptimization();
@@ -172,7 +171,7 @@ namespace GraphicalTweaks
                 try { restore?.Invoke(); }
                 finally { owner.UnpatchSelf(); }
             };
-            if (native) lifetime.TryStartNative(name, NativeAssembly, initialize, cleanup);
+            if (native) lifetime.TryStartNative(name, () => NativeFeatureContracts.Require(name), initialize, cleanup);
             else lifetime.TryStart(name, initialize, cleanup);
         }
 

@@ -24,6 +24,10 @@ try {
  $buildProperties=@()
  if($GameDirectory){$buildProperties+=('-p:GameDir='+$GameDirectory)}
  if($LoaderDirectory){$buildProperties+=('-p:LoaderDir='+$LoaderDirectory)}
+ if(!$SkipTests){
+  & $dotnetPath run --project tests/NativeContract.Tests -c Release @restoreOptions @buildProperties
+  if($LASTEXITCODE){throw 'Native contract regression checks failed'}
+ }
  & $dotnetPath build src/GraphicalTweaks.Unity6 -c Release @restoreOptions @buildProperties
  if($LASTEXITCODE){throw 'Plugin build failed'}
  $shaderRoot=Get-BuildPath $root $ShaderDirectory
@@ -39,7 +43,12 @@ try {
  Copy-Item -LiteralPath $bundle -Destination (Get-BuildPath $root (Join-Path $plugin 'graphicaltweaks-glass.bundle'))
  Copy-Item -LiteralPath (Join-Path $root 'README.md') -Destination (Get-BuildPath $root (Join-Path $output 'README.md'))
  Copy-Item -LiteralPath (Join-Path $root 'LICENSE') -Destination (Get-BuildPath $root (Join-Path $output 'LICENSE'))
- [string[]]$hashLines=foreach($name in @('BepInEx/plugins/GraphicalTweaks/GraphicalTweaks.dll','BepInEx/plugins/GraphicalTweaks/graphicaltweaks-glass.bundle','README.md','LICENSE')) {
+ Copy-Item -LiteralPath (Join-Path $root 'CHANGELOG.md') -Destination (Get-BuildPath $root (Join-Path $output 'CHANGELOG.md'))
+ New-Item -ItemType Directory -Force -Path (Join-Path $output 'docs') | Out-Null
+ foreach($name in @('DEVELOPMENT.md','PERFORMANCE.md')) {
+  Copy-Item -LiteralPath (Join-Path $root ('docs/'+$name)) -Destination (Join-Path $output ('docs/'+$name))
+ }
+ [string[]]$hashLines=foreach($name in @('BepInEx/plugins/GraphicalTweaks/GraphicalTweaks.dll','BepInEx/plugins/GraphicalTweaks/graphicaltweaks-glass.bundle','README.md','LICENSE','CHANGELOG.md','docs/DEVELOPMENT.md','docs/PERFORMANCE.md')) {
   (Get-FileHash -LiteralPath (Join-Path $output $name)).Hash.ToLowerInvariant()+'  '+$name
  }
  [IO.File]::WriteAllLines((Get-BuildPath $root (Join-Path $output 'SHA256SUMS.txt')),$hashLines,[Text.UTF8Encoding]::new($false))

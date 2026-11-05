@@ -20,9 +20,6 @@ namespace GraphicalTweaks
     internal sealed class GlassRenderingController : IDisposable
     {
 #if SEVO_UNITY6
-        // Managed layout/source hooks match; catalog admission still proves
-        // live strides, materials, rotations and shape geometry independently.
-        private const string SupportedAssembly="00859162-dd57-4798-be35-54252142455d";
         private static readonly int ReflectionCube0=Shader.PropertyToID("unity_SpecCube0");
         private static readonly int ReflectionCube1=Shader.PropertyToID("unity_SpecCube1");
         private readonly Cubemap[] neutralProbes=new Cubemap[4];
@@ -78,8 +75,7 @@ namespace GraphicalTweaks
             if(Chainloader.PluginInfos.ContainsKey("local.sevo.graphicaltweaks.glassrenderingprobe"))return;
             try
             {
-                if(typeof(VoxelEntity).Assembly.ManifestModule.ModuleVersionId.ToString("D")!=SupportedAssembly)
-                    throw new NotSupportedException("Unvalidated game assembly for expanded glass observers.");
+                VerifyNativeContract();
                 GlassShapeCoverage.PublicationFailed+=OnExpandedPublicationFailure;
                 GlassShapeCoverage.CatalogInvalidated+=OnExpandedCatalogInvalidated;
                 GlassShapeCoverage.Install(harmony);expandedObservers=true;
@@ -103,8 +99,7 @@ namespace GraphicalTweaks
             if(diagnosticSession){log.LogInfo("Glass development probe owns rendering; main glass controller suspended.");return;}
             try
             {
-                if(typeof(VoxelEntity).Assembly.ManifestModule.ModuleVersionId.ToString("D")!=SupportedAssembly)
-                    throw new NotSupportedException("This game assembly has not been validated for glass rendering.");
+                VerifyNativeContract();
                 if(MappingField==null||ClipField==null||ArgsField==null||ShapeField==null)
                     throw new MissingFieldException("The native glass buffer interface changed.");
                 instance=this;
@@ -117,6 +112,15 @@ namespace GraphicalTweaks
             }
             catch(Exception error){Fault("Glass rendering unavailable; native rendering retained",error);}
             Apply();
+        }
+        private static void VerifyNativeContract()
+        {
+#if SEVO_UNITY6
+            NativeFeatureContracts.Require("glass-bootstrap");
+#else
+            if(typeof(VoxelEntity).Assembly.ManifestModule.ModuleVersionId.ToString("D")!=SupportedAssembly)
+                throw new NotSupportedException("This game assembly has not been validated for glass rendering.");
+#endif
         }
         internal void SetOptions(bool sunlightOcclusion,bool seamlessGlass)
         {

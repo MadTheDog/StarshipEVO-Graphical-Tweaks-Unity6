@@ -6,7 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="../../src/GraphicalTweaks.Unity6/FeatureLifetime.cs" Link="FeatureLifetime.cs" />
-    <Compile Include="../../src/GraphicalTweaks.Unity6/NativeBuildProfile.cs" Link="NativeBuildProfile.cs" />
     <Compile Include="../../src/GraphicalTweaks.Unity6/BakedGlassHorizonPolicy.cs" Link="BakedGlassHorizonPolicy.cs" />
   </ItemGroup>
 </Project>

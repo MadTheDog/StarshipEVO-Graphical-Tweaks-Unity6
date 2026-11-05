@@ -13,12 +13,17 @@ namespace GraphicalTweaks
         internal FeatureLifetime(Action<string, Exception> report)
         { this.report = report ?? throw new ArgumentNullException(nameof(report)); }
 
-        internal bool TryStartNative(string name, Guid assembly, Action initialize, Action restore)
+        internal bool TryStartNative(string name, Action validate, Action initialize, Action restore)
         {
-            if (NativeBuildProfile.IsSupported(assembly)) return TryStart(name, initialize, restore);
-            if (!disposed && attempted.Add(name))
-                Report(name, new NotSupportedException("Unvalidated native game assembly " + assembly.ToString("D")));
-            return false;
+            if (disposed || attempted.Contains(name)) return false;
+            try { validate(); }
+            catch (Exception error)
+            {
+                attempted.Add(name);
+                Report(name, error);
+                return false;
+            }
+            return TryStart(name, initialize, restore);
         }
 
         internal bool TryStart(string name, Action initialize, Action restore)

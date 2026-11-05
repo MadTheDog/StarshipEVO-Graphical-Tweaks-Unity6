@@ -11,10 +11,7 @@ namespace GraphicalTweaks
     // only exact component-owned camera attachments are normalized.
     internal static class AmbientOcclusionLifecycle
     {
-#if SEVO_UNITY6
-        // Field/registration IL and native pointer identity revalidated separately.
-        private const string NativeMvid = "00859162-dd57-4798-be35-54252142455d";
-#else
+#if !SEVO_UNITY6
         private const string NativeMvid = "f4666bd3-9a44-486c-b149-36d0a9c82e72";
 #endif
         private const CameraEvent Stage = CameraEvent.BeforeLighting;
@@ -38,8 +35,12 @@ namespace GraphicalTweaks
             try
             {
                 var gameAssembly=typeof(VoxelEngine.Brick).Assembly;
+#if SEVO_UNITY6
+                NativeFeatureContracts.Require("ambient-occlusion");
+#else
                 if (gameAssembly.ManifestModule.ModuleVersionId.ToString("D") != NativeMvid)
                     throw new NotSupportedException("native Assembly-CSharp MVID differs");
+#endif
                 nativeType=gameAssembly.GetType("MiniEngineAO.AmbientOcclusion",false);
                 if(nativeType==null || !typeof(Behaviour).IsAssignableFrom(nativeType))
                     throw new NotSupportedException("native AO component type is unavailable");
@@ -59,7 +60,7 @@ namespace GraphicalTweaks
                 owner.Patch(register, prefix: Callback(nameof(BeforeRegister)), finalizer: Callback(nameof(NativeFailed)));
                 owner.Patch(unregister, postfix: Callback(nameof(AfterUnregister)), finalizer: Callback(nameof(NativeFailed)));
                 Installed = Supported = true;
-                Log("AO lifecycle candidate installed, disabled; guarded native MVID=" + NativeMvid + "; pointer identity available=" + (pointerField != null));
+                Log("AO lifecycle installed; native contract verified; pointer identity available=" + (pointerField != null));
             }
             catch (Exception error)
             {

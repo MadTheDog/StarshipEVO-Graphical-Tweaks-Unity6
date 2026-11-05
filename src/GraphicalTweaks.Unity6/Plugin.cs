@@ -5,7 +5,7 @@ using BepInEx.Logging;
 
 namespace GraphicalTweaks
 {
-    [BepInPlugin(Id, "Sal's Graphical Tweaks", "2.0.0")]
+    [BepInPlugin(Id, "Sal's Graphical Tweaks", "2.0.1")]
     public sealed class Plugin : BaseUnityPlugin
     {
         public const string Id = "local.sevo.graphicaltweaks";

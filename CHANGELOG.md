@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.1
+
+- Updated compatibility for SEVO 26w45a, Steam build 26451593.
+- Replaced Unity6 assembly-ID gates with checks of each native feature's
+  methods, fields and buffer layouts.
+- Scoped glass shader validation to the transparent pass and its executable
+  D3D11 programs. Other voxel shader passes can change independently.
+- Added regression checks for unrelated assembly and asset-ID changes and
+  incompatible method, layout and transparent-program changes.
+
 ## 2.0.0
 
 - Ported the graphics settings, rendering optimisations and glass features to

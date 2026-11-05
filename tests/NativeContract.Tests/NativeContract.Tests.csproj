@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <NuGetAudit>false</NuGetAudit>
+    <GameDir Condition="'$(GameDir)'==''">$(MSBuildThisFileDirectory)../../game</GameDir>
+    <LoaderDir Condition="'$(LoaderDir)'==''">$(GameDir)/BepInEx/core</LoaderDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/GraphicalTweaks.Unity6/NativeContractFingerprint.cs" Link="NativeContractFingerprint.cs" />
+    <Compile Include="../../src/GraphicalTweaks.Unity6/NativeContractManifest.cs" Link="NativeContractManifest.cs" />
+    <Compile Include="../../src/GraphicalTweaks.Unity6/NativeShaderContract.cs" Link="NativeShaderContract.cs" />
+    <Compile Include="../../src/GraphicalTweaks.Unity6/ShaderProgramFingerprint.cs" Link="ShaderProgramFingerprint.cs" />
+    <Reference Include="Mono.Cecil"><HintPath>$(LoaderDir)/Mono.Cecil.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

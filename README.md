@@ -1,10 +1,10 @@
-# Sal's Graphical Tweaks v 2.0.0 — Unity 6
+# Sal's Graphical Tweaks v 2.0.1 — Unity 6
 
 ---
 
 ## Short introduction
 
-Client-side graphics controls, glass fixes and rendering optimisations for Starship EVO. This edition targets **SEVO 26w44a, Steam build 26394979, on Unity 6000.6.6f1**.
+Client-side graphics controls, glass fixes and rendering optimisations for Starship EVO. This edition targets **SEVO 26w45a, Steam build 26451593, on Unity 6000.6.6f1**.
 
 ---
 
@@ -26,15 +26,22 @@ Find the controls under **Options → Graphics**. Changes are saved between sess
 | Ambient occlusion optimisation | Clears duplicate AO passes and stale work after AO is disabled. | Reduces redundant work. |
 | Decal CPU optimisation (experimental) | Skips some off-screen decal work during quick camera turns. Off by default. | May reduce CPU work while turning. Idle CPU use can rise. |
 
-### What was tested on Unity 6
+### What was tested
 
-- Startup, clean exit, graphics menu rebuilds, numeric inputs and resets in an isolated installation.
-- Shadow distance and sharp range in the cockpit, plus native sun-resolution setter and reset checks.
-- Live decal updates at 10×, empty-pass dispatch counts and native ambient occlusion attachment checks.
-- Blocked sunlight glare, the rounded glass corner, the moving blue band and the neutral sheen presets in the cockpit.
-- Matching transparent pipe joins passed geometry checks and appeared seamless in a player visual check.
+**v2.0.1 / 26w45a, Steam build 26451593:**
 
-On one detailed ship at 1440p, the Unity 6 benchmark averaged **72.4 FPS** at
+- Startup, normal exit, graphics menu rebuilds, numeric callbacks and resets in an isolated creative world.
+- Native shadow distance, cascade split and resolution setters; queued decal range changes; renderer dispatch activity and AO attachment ownership.
+- All five native feature contracts passed. The live glass catalog admitted all twelve supported shapes, and a 300-block glass snapshot completed with no pending updates or reported faults.
+- 224 GPU comparison cases passed against the updated game's transparent pixel shaders using the released mod shader bundle.
+- Regression checks covered unrelated assembly and asset changes, incompatible methods and layouts, shader changes and independent feature rejection.
+
+Cockpit visual comparisons and FPS measurements have not been repeated on 26w45a.
+The earlier **v2.0.0 / 26w44a** tests covered blocked sunlight glare, rounded
+glass corners, the moving blue band, neutral sheen and 10× decals. A player
+visual check confirmed seamless transparent pipe joins on that version.
+
+The **v2.0.0 / 26w44a** benchmark on one detailed ship at 1440p averaged **72.4 FPS** at
 Vanilla MAX, **74.3 FPS** with the tweaks enabled at vanilla ranges, and
 **69.9 FPS** with 1500-unit shadows and 10× decals. The runs changed groups of
 settings together. [Settings, 1% lows and test method](docs/PERFORMANCE.md).
@@ -43,7 +50,7 @@ settings together. [Settings, 1% lows and test method](docs/PERFORMANCE.md).
 
 ## Installation requirements
 
-- **Starship EVO 26w44a**, Steam build **26394979**, Unity **6000.6.6f1**.
+- **Starship EVO 26w45a**, Steam build **26451593**, Unity **6000.6.6f1**.
 - **64-bit Windows**, the game's **Mono** player and **Direct3D 11**.
 - **BepInEx 5 for Windows x64**. Tested with [5.4.23.5](https://github.com/BepInEx/BepInEx/releases/tag/v5.4.23.5).
 - For glass sunlight occlusion, use sun shadows and the game’s HDR/Linear rendering path.
@@ -56,7 +63,7 @@ settings together. [Settings, 1% lows and test method](docs/PERFORMANCE.md).
 2. In Steam, open **Starship EVO → Manage → Browse local files**. This is the folder containing `Starship EVO.exe`.
 3. Extract BepInEx 5 for Windows x64 beside the executable. Launch SEVO once, then close it to generate the BepInEx configuration.
 4. In `BepInEx/config/BepInEx.cfg`, set the existing `HideManagerGameObject` key under `[Chainloader]` to `true`.
-5. Download `Sals-Graphical-Tweaks-Unity6-2.0.0.zip` from [Releases](https://github.com/MadTheDog/StarshipEVO-Graphical-Tweaks-Unity6/releases/latest).
+5. Download `Sals-Graphical-Tweaks-Unity6-2.0.1.zip` from [Releases](https://github.com/MadTheDog/StarshipEVO-Graphical-Tweaks-Unity6/releases/latest).
 6. Extract the ZIP’s `BepInEx` folder into the game folder. The files should land here:
 
    ```text
@@ -85,6 +92,7 @@ When updating, close the game and replace both files together. Keep one installe
 
 - Back up an existing world before trying the mod. The tweaks apply to local rendering and client preferences.
 - Multiplayer, sustained remote building and stress tests with many grids or windows are pending.
+- Native features check their methods, fields, buffer layouts and relevant shader data once at startup. A failed check disables the affected feature and logs its reason. Unrelated assembly changes can pass these checks; future releases still need testing.
 - Shadow coverage and quality affect the sunlight correction. Decal range depends on projected size, receiver depth and tile limits.
 - Unofficial mod, unaffiliated with Moonfire Entertainment.
 - [Building from source](docs/DEVELOPMENT.md).

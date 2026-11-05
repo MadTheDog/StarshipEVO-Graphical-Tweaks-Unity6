@@ -38,9 +38,7 @@ namespace GraphicalTweaks
     {
         static readonly ushort[] Ids={166,168,314,315,316,167,118,313,317,207,209};
         static readonly int[] ExpectedGroups={6,5,4,7,5,4,3,6,3,4,3};
-#if SEVO_UNITY6
-        static readonly Guid ExpectedMvid=new Guid("00859162-dd57-4798-be35-54252142455d");
-#else
+#if !SEVO_UNITY6
         static readonly Guid ExpectedMvid=new Guid("f4666bd3-9a44-486c-b149-36d0a9c82e72");
 #endif
         static readonly GlassShapeRotation Identity=new GlassShapeRotation(new float[]{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1});
@@ -63,8 +61,14 @@ namespace GraphicalTweaks
             try
             {
                 var native=BrickMeshResources.shapeMeshDatas;var materials=VoxelMaterialResources.materialParamDatas;
-                if(typeof(BrickMeshResources).Module.ModuleVersionId!=ExpectedMvid||Marshal.SizeOf(typeof(BrickMeshResources.ShapeMeshData))!=124)
-                    return Fail("native assembly MVID or 124-byte shape ABI changed",out reason);
+#if SEVO_UNITY6
+                NativeFeatureContracts.Require("glass-bootstrap");
+#else
+                if(typeof(BrickMeshResources).Module.ModuleVersionId!=ExpectedMvid)
+                    return Fail("native assembly MVID changed",out reason);
+#endif
+                if(Marshal.SizeOf(typeof(BrickMeshResources.ShapeMeshData))!=124)
+                    return Fail("native 124-byte shape ABI changed",out reason);
                 if(source==null||!source.IsValid()||source.stride!=124||source.count<=0||source.count>4*1024*1024||source.count%3!=0||native.Count!=source.count)
                     return Fail("native CPU/source-buffer identity count or stride invalid",out reason);
                 if(materials==null||VoxelMaterialResources.MaterialCount<1||VoxelMaterialResources.MaterialCount>materials.Length)

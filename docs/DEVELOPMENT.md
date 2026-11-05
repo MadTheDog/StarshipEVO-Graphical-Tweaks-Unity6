@@ -27,5 +27,23 @@ dependencies. `-SkipTests` is available for documentation-only iterations.
 
 The output directory defaults to `dist/GraphicalTweaks`. It contains the two
 plugin files under `BepInEx/plugins/GraphicalTweaks`, alongside the README,
-license and checksums. Several production source files are linked from
+changelog, license, documentation and checksums. Several production source files are linked from
 `tests/`, so keep the source tree structure intact.
+
+## Native compatibility checks
+
+`NativeContractCatalog.cs` records normalized method, field and layout
+fingerprints for each native feature. Metadata token and MVID changes do not
+affect these fingerprints. The method checks are conservative: an implementation
+change can require review even if it preserves the game's behavior.
+
+Glass also checks the named native transparent pass and its referenced D3D11
+programs. Shader object IDs and program blob indices can move independently.
+Live geometry, material, buffer and resource-ownership checks still run where
+those resources are consumed. The startup results are cached; the fingerprint
+catalog is not rehashed every frame.
+
+When a dependency changes, inspect that feature and repeat its isolated tests
+before recording a new fingerprint. A Steam build ID or assembly MVID is useful
+test provenance, but is not a compatibility gate. Run `NativeContract.Tests`
+through the normal build to check rejection and independence behavior.
