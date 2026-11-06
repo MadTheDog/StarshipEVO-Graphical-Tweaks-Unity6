@@ -36,6 +36,8 @@ Find the controls under **Options → Graphics**. Changes are saved between sess
 - 224 GPU comparison cases passed against the updated game's transparent pixel shaders using the released mod shader bundle.
 - Regression checks covered unrelated assembly and asset changes, incompatible methods and layouts, shader changes and independent feature rejection.
 
+[Compatibility checks and the 6 November recheck](docs/COMPATIBILITY.md).
+
 Cockpit visual comparisons and FPS measurements have not been repeated on 26w45a.
 The earlier **v2.0.0 / 26w44a** tests covered blocked sunlight glare, rounded
 glass corners, the moving blue band, neutral sheen and 10× decals. A player
