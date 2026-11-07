@@ -44,8 +44,8 @@ can require review even if it preserves behavior. Future releases need checking.
 ## Runtime and performance limits
 
 This review launched no game. The earlier 5 November 26w45a run checked
-startup, normal exit, menu callbacks and resets, rendering hooks, AO ownership,
-the twelve-shape glass catalog and a current 300-block glass snapshot. Its
+startup, menu callbacks and resets, rendering hooks, AO ownership, the
+twelve-shape glass catalog and a current 300-block glass snapshot. Its
 raster capture contained no supported glass samples, so it did not establish
 visual quality. The separately recorded 224 synthetic GPU comparisons passed
 against the updated native pixel shaders.
@@ -53,3 +53,27 @@ against the updated native pixel shaders.
 Fresh cockpit visual comparisons, multiplayer, large-world stress tests and
 FPS measurements remain pending. The [published FPS measurements](PERFORMANCE.md)
 belong to **v2.0.0 / 26w44a**; this review claims no additional FPS gain.
+
+## Starship Keel coexistence
+
+On 7 November 2026, the released **Graphical Tweaks v2.0.1** passed live
+graphics checks alongside **Starship Keel v0.1.2** in audit mode. The isolated
+windowed solo run used **Steam build ID 26451593 / 26w45a**, Unity 6000.6.6f1,
+Windows x64 Mono, Direct3D 11 and BepInEx 5.4.23.5. The official SDK and runtime
+archives matched their published SHA-256 checksums. Graphical Tweaks uses its
+standalone BepInEx entry point, with Keel as an optional companion.
+[Keel v0.1.2 release](https://github.com/MadTheDog/Starship-Keel/releases/tag/v0.1.2)
+
+- Both plugins loaded. Seventeen native smoke checks and nine numeric and reset
+  callbacks passed, and all thirteen graphics menu rows settled correctly.
+- Renderer dispatches, one owned AO attachment on the player camera and native
+  glass draw integration were observed. The glass catalog admitted twelve shapes,
+  and the current snapshot tracked 278 blocks with zero pending updates or
+  reported faults.
+- Native save-on-exit hit the same Windows `File.Replace` error recorded in the
+  5 November pre-Keel run. Clean save-on-exit remains unverified in the isolated
+  fixture.
+
+Coverage is Keel audit mode in solo play. Functional registration, cockpit
+visual comparisons, multiplayer and FPS measurements remain outside this run's
+coverage.

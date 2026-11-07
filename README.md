@@ -30,7 +30,7 @@ Find the controls under **Options → Graphics**. Changes are saved between sess
 
 **v2.0.1 / 26w45a, Steam build 26451593:**
 
-- Startup, normal exit, graphics menu rebuilds, numeric callbacks and resets in an isolated creative world.
+- Startup, graphics menu rebuilds, numeric callbacks and resets in an isolated creative world.
 - Native shadow distance, cascade split and resolution setters; queued decal range changes; renderer dispatch activity and AO attachment ownership.
 - All five native feature contracts passed. The live glass catalog admitted all twelve supported shapes, and a 300-block glass snapshot completed with no pending updates or reported faults.
 - 224 GPU comparison cases passed against the updated game's transparent pixel shaders using the released mod shader bundle.
@@ -55,6 +55,7 @@ settings together. [Settings, 1% lows and test method](docs/PERFORMANCE.md).
 - **Starship EVO 26w45a**, Steam build **26451593**, Unity **6000.6.6f1**.
 - **64-bit Windows**, the game's **Mono** player and **Direct3D 11**.
 - **BepInEx 5 for Windows x64**. Tested with [5.4.23.5](https://github.com/BepInEx/BepInEx/releases/tag/v5.4.23.5).
+- **Starship Keel is optional.** The released v2.0.1 passed live graphics checks alongside Keel v0.1.2 in audit mode. [Keel test coverage](docs/COMPATIBILITY.md#starship-keel-coexistence)
 - For glass sunlight occlusion, use sun shadows and the game’s HDR/Linear rendering path.
 
 ---
